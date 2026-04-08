@@ -26,7 +26,7 @@ Click on any date in the calendar. A popup will show all records for that day.
 - You can also select a specific date range to view the income and expenditure pie chart.
 
 ### 2.4 Set a Savings Goal
-- You can enter a **goal amount** (e.g., 1000).
+- You can enter a **goal amount** (e.g.1000).
 - The progress bar and label will update automatically based on your **monthly balance**.
 - The goal amount is saved in your browser (localStorage) and persists after closing the browser.
 
@@ -34,6 +34,6 @@ Click on any date in the calendar. A popup will show all records for that day.
 - Click the **Delete All Data** button. All records will be deleted and cannot be undone.
 
 ## 3. Technologies Used
-- HTML5, CSS3, JavaScript (ES6)
+- HTML, CSS, JavaScript
 - IndexedDB (for transaction records)
 - Chart.js (for pie charts)
