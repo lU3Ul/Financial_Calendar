@@ -1,0 +1,68 @@
+#calendarTable{
+    width:100%;
+    border-collapse:collapse;
+    background-color:white;
+    table-layout: fixed;
+    border-radius:12px;
+}
+#calendarTable th {
+    background-color: #eee;
+    color: #444;
+    font-weight: 600;
+    padding: 10px;
+    font-size: 18px;
+    border-bottom: 1px solid #eee;
+}
+#calendarTable td {
+    width: 14.28%;              /* ensure the width of calendar fixed */
+    height: 60px;     
+    vertical-align: top;
+    border: 1px solid #eee; 
+    overflow: hidden;
+    word-wrap: break-word;      /* avoid overflow cells */
+}
+#calendarTable td:hover {
+    background-color: #f0f7ff;  /* enhance interactivity */
+}
+#calendarTable td b {
+    color: #444;
+    font-size: 20px;
+    padding-left: 8px;
+}
+.cell-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    font-size: 12px; 
+}
+.day-record-item {
+    color: #444;   
+}
+/* The button Prev and Next */
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+.calendar-nav button {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 6px 15px;
+    border-radius: 20px; 
+    cursor: pointer;                /* clickable */
+    font-weight: 600;
+    color: #555;
+}
+
+.calendar-nav button:hover {
+    background-color: #6eb9ff;
+    color: white;
+    border-color: white;
+}
+#monthDisplay {
+    font-size:28px; 
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}

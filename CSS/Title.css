@@ -1,0 +1,28 @@
+.Title-container{
+    text-align:center;
+    display:block;
+    margin:5px auto;
+    font-size:5rem;
+    font-weight:800;
+}
+.logo-text {
+    font-family: "Futura"; 
+    font-weight: bolder;          
+    font-size: 5rem;          
+    letter-spacing: 8px;       
+    text-transform: uppercase; 
+    color: #ff84c2;
+    -webkit-text-stroke: 5px #ff84c2;
+    text-shadow: 0px 0px 50px #f6aed0;
+}
+
+
+
+
+
+
+
+
+
+
+

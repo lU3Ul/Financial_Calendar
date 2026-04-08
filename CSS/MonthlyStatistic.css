@@ -1,0 +1,75 @@
+.summary-area {
+    display:flex;
+    gap:10px;
+    padding:0px;
+    align-items:flex-start; 
+
+}
+.summary-container {
+    display: flex;
+    flex-direction: row;         
+    gap: 15px;             
+    margin-top: 0px;
+}
+.summary-card {
+    flex: 1;               
+    background: white;
+    padding: 15px;
+    border-radius: 16px;
+    text-align: center;
+}
+
+.summary-card .label {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 15px;
+    text-transform: uppercase; 
+}
+
+.summary-card .value {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+.summary-card.income {box-shadow: 5px 5px 0px #4ebe16;}
+.summary-card.expense {box-shadow: 5px 5px 0px #ea2222;} 
+.summary-card.balance {box-shadow: 5px 5px 0px #2292f4;} 
+
+.card-group { 
+    flex:8;
+    display:flex;
+    gap:15px;
+}
+.main-view{
+    flex:2;
+    flex-direction: column;
+    display:flex;
+    gap:10px;
+    margin-top:5px;
+}
+
+#startDate, #endDate {
+    border-radius: 8px;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background-color: white;
+    font-size: 14px;
+    box-sizing: border-box;
+    width: 100%; 
+}
+#startDate:focus, #endDate:focus {
+    border-color: #6eb9ff;          
+    outline: none;
+}
+#Summary {
+    height: 40px;                
+    background-color: #ff84c2;  
+    color: white;                
+    border: none;                
+    border-radius: 12px;  
+    font-size:16px;       
+    font-weight: bold;           
+    cursor: pointer;             
+}
+
+

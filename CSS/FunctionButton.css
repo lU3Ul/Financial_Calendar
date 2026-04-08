@@ -1,0 +1,115 @@
+/* Toggle Button*/
+.type-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.toggle-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+#btnExpense.active { background-color: #ff7675; color: white; border-color: white; }
+#btnIncome.active { background-color: #4ebe16; color: white; border-color: white; }
+/* Category Button */
+#categoryGroup {
+    margin:5px 0;
+    padding:10px 0;
+    width:100%;
+}
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);      /* make the buttons occupy six columns on average */
+    gap: 10px;                            
+    width: 100%;                                                
+}
+.category-btn {
+    width:80px;
+    height:40px;
+    text-align:center;
+    display: flex;
+    justify-content:center;
+    align-items:center;          
+    font-weight:bold;
+    cursor: pointer;
+    border-radius:20px;           
+    font-size: 14px;
+}
+.category-btn[data-category="trip"]{ background-color: #75c4f6; } 
+.category-btn[data-category="diet"]{ background-color: #75d28c; } 
+.category-btn[data-category="clothes"]{ background-color: #ffbdee; } 
+.category-btn[data-category="play"]{ background-color: #fab1a0; } 
+.category-btn[data-category="house"]{ background-color: #f9e187; } 
+.category-btn[data-category="health"]{ background-color: #a4f675; } 
+.category-btn[data-category="Salary"]{ background-color: #73c9f7; } 
+.category-btn[data-category="Bonus"]{ background-color: #feed6e; } 
+.category-btn[data-category="Part-time"]{ background-color: #ffa8f8; } 
+.category-btn[data-category="Prize"]{ background-color: #83c894; } 
+    
+.category-btn:hover{
+    color: white;
+    border-color:white;
+}
+
+.category-btn.selected{
+    color:white;
+    border-color:white;
+}
+/* Record box*/
+#recordDate, #recordAmount, #recordDesc {
+    width: 100%;             
+    padding: 12px;           
+    margin-bottom: 8px;
+    border: 1px solid #ddd; 
+    background-color: white;
+    border-radius: 8px;      
+    box-sizing: border-box;
+    font-size: 16px;
+    color: #333;    
+}
+#recordDate:focus, #recordAmount:focus, #recordDesc:focus {
+    border-color: #6eb9ff; 
+    outline:none;               /* match the theme color */
+}
+/* Add and Delete Button*/
+.add-and-delete-button {
+    display: flex;
+    gap: 15px;           
+    margin-top: 5px;    
+}
+.add-btn {
+    flex:7;            
+    background-color: #6eb9ff; 
+    color: white;             
+    border: none;             
+    padding: 15px;            
+    margin-top: 10px;
+    border-radius: 8px; 
+    font-size: 18px;       
+    font-weight: bold;        
+    cursor: pointer;  
+    width: auto;         
+    margin-top: 0; 
+}
+.delete-data-button {  
+    flex: 3;             
+    margin-top: 0;     
+    padding: 10px 20px;
+    border-radius: 8px;     
+    font-size: 20px;
+    background-color: #ffd4d4; 
+    color: #ff4949;          
+    border: 1px solid #ff4949;
+    cursor: pointer;  
+    margin-top: 0;              
+}
+.delete-data-button:hover {                   
+    background-color: #ff4949;    
+    color: #ffd4d4;              
+    border-color: #f56c6c;        
+    box-shadow: 0 4px 10px rgba(255, 0, 0, 0.5); 
+}

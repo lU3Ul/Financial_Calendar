@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Financial Calendar</title>
+    <link rel="stylesheet" href="CSS/calendar.css">
+    <link rel="stylesheet" href="CSS/MonthlyStatistic.css">
+    <link rel="stylesheet" href="CSS/FunctionButton.css">
+    <link rel="stylesheet" href="CSS/SavingGoal.css">
+    <link rel="stylesheet" href="CSS/Popup.css">
+    <link rel="stylesheet" href="CSS/basic.css">
+    <link rel="stylesheet" href="CSS/Title.css">
+    <script src = "db.js"></script>
+    <script src = "chart.js"></script>
+</head>
+<body>
+    <div class="Title-container">
+        <div class="logo-text">Financial Calendar</div>
+    </div>
+    <div class="main-layout">
+        <!-- ====== divide into left and right panels ====== -->
+        <div class="left-panel">
+            <div class="calendar-area">
+                <!-- ========== Month navigation ========== -->
+                <div class="calendar-nav"><button onclick="prevMonth()">← Prev</button>
+                    <span id="monthDisplay"></span>
+                    <button onclick="nextMonth()">Next →</button>
+                </div>
+                <!-- ========== Calendar table ========== --> 
+                <table id="calendarTable">
+                    <thead>
+                        <tr>
+                            <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendarBody"></tbody>
+                </table>
+                </div>
+                <div id="popup" class="popup" onclick="closePopupIfOutside(event)">
+                    <div class="popup-content">
+                        <span class="close" onclick="closePopup()">&times;</span>
+                        <h3>Records for <span id="popupDate"></span></h3>
+                        <div id="popupRecords"></div>
+                    </div>
+            </div>
+            <h3>Monthly Statistic</h3>
+            <div class="summary-area">
+                <div class="summary-container" id="monthSummary">
+                    <div class="card-group">
+                <!-- ========== Popup modal for displaying records of a selected date ========== -->
+                        <div class="summary-card income">
+                            <div class="label">Monthly Income</div>
+                            <div class="value" id="totalIncome">$0.00</div>
+                        </div>
+                        <div class="summary-card expense">
+                            <div class="label">Monthly Expense</div>
+                            <div class="value" id="totalExpense">$0.00</div>
+                        </div>
+                        <div class="summary-card balance">
+                            <div class="label">Monthly Balance</div>
+                            <div class="value" id="totalBalance">$0.00</div>
+                        </div>
+                    </div>
+                    <div id="mainView" class="main-view">
+                        <input type = "date" id = "startDate">
+                        <input type = "date" id = "endDate">
+                        <button id = "Summary">Show Summary</button>
+                    </div>
+                </div>
+                <!-- ======== Visual Chart ======== -->
+                <div id="summaryPopup" class="popup" onclick="closeSummaryPopupIfOutside(event)">
+                    <div class="popup-content" style="max-width: 600px;">
+                        <span class="close" onclick="closeSummaryPopup()">&times;</span>
+                        <h1 id="sumhead">Spending Summary</h1>
+                        <div class="charts-container">
+                            <canvas id="summaryChart" width="250" height="150" style="max-width:100%; height:auto; margin-bottom:10px;"></canvas>
+                            <canvas id="incomeCategoryChart" width="250" height="150" style="max-width:100%; height:auto; margin-bottom:10px;"></canvas>
+                            <canvas id="expenseCategoryChart" width="250" height="150" style="max-width:100%; height:auto; margin-bottom:10px;"></canvas>
+                        </div>
+                        <div id="summaryContent"></div>
+                        <button id="closeSummaryBtn" style="margin-top: 10px;">Close</button>
+                    </div>
+                </div>              
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="goal-area">
+                <!-- ========== Savings goal input and progress bar ========== -->
+                <div style="display: flex; align-items: center; flex-wrap: wrap;">
+                    <div class="savings-goal-container">
+                        <span class="savings-goal-title">Save goal amount: $</span>
+                        <input type="number" id="savingsGoal" class="savings-goal-input" 
+                            placeholder="e.g., 1000" value="1000" step="100">
+                    </div>
+                </div>
+                <!-- Process area -->
+                <div style="margin-left: 20px; margin-top: 5px;">
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar">0%</div>
+                    </div>
+                    <div class="progress-label" id="progressLabel">Progress towards goal</div>
+                </div>
+            </div>
+                <!-- ========== Form to add a new record ========== -->
+                <h3>Add Income & expense:</h3>
+                <form onsubmit="addRecord(); return false;">
+                    <div class="type-toggle">
+                        <button type="button" id="btnExpense" class="toggle-btn active" onclick="changeType('expense')">Expense</button>
+                        <button type="button" id="btnIncome" class="toggle-btn" onclick="changeType('income')">Income</button>
+                        <input type="hidden" id="recordType" value="expense">
+                    </div>
+                    <div class="input-item">
+                        <h3>Date:</h3><input type="date" id="recordDate" required>
+                    </div>
+                    <div class="input-item">
+                        <h3>Amount:</h3><input type="number" id="recordAmount" step="0.01" required>
+                    </div>
+                    <!-- Category buttons -->
+                    <div id="categoryGroup">
+                        <div id="expenseCats" style="display:flex;">
+                            <div class="category-grid">
+                                <span class="category-btn" data-category="trip">Trip</span>
+                                <span class="category-btn" data-category="diet">Diet</span>
+                                <span class="category-btn" data-category="clothes">Clothes</span>
+                                <span class="category-btn" data-category="play">Play</span>
+                                <span class="category-btn" data-category="house">House</span>
+                                <span class="category-btn" data-category="health">Health</span>
+                            </div>
+                        </div>
+                        <div id="incomeCats" style="display:none;">
+                            <div class="category-grid">
+                                <span class="category-btn" data-category="Salary">Salary</span>
+                                <span class="category-btn" data-category="Bonus">Bonus</span>
+                                <span class="category-btn" data-category="Part-time">Part-time</span>
+                                <span class="category-btn" data-category="Prize">Prize</span>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>Description:</h3><input type="text" id="recordDesc"><br>
+                    <!-- add button and delete button -->
+                    <div class="add-and-delete-button">
+                        <button type="submit" class="add-btn">Add Record</button>
+                        <button id="deleteData" class="delete-data-button">Delete All Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>                
+    </div>
+
+    <script>
+        // ========== Saving goal (persisted in localStorage) ==========
+        // ===get the saving goal and default is 1000
+        let savingsGoal = parseFloat(localStorage.getItem('savingsGoal')) || 1000;
+        document.getElementById('savingsGoal').value = savingsGoal;
+        
+        // Save goal to localStorage on every input
+        document.getElementById('savingsGoal').addEventListener('input', function() {
+            savingsGoal = parseFloat(this.value) || 0;
+            localStorage.setItem('savingsGoal', savingsGoal);
+            updateProgressBar();     
+        });
+
+
+        // ========== Global variables ==========
+        let year = new Date().getFullYear();      // Current displayed year
+        let month = new Date().getMonth();        // Current displayed month (0-11)
+        let records = [];                          // Array holding all financial records
+
+        // ========== Helper function ==========
+        function getTodayString() {
+            let d = new Date();
+            let y = d.getFullYear();
+            let m = d.getMonth() + 1;
+            let day = d.getDate();
+            if (m < 10) m = '0' + m;
+            if (day < 10) day = '0' + day;
+            return y + '-' + m + '-' + day;
+        }
+
+        // Formats a date string (currently just returns it)
+        function formatDate(dateStr) {
+            return dateStr;
+        }
+
+        // ========== Progress bar update ==========
+        // based on monthly balance
+        function updateProgressBar() {
+            let m = month + 1;
+            let prefix = year + '-' + (m < 10 ? '0' + m : m);
+            let income = 0, expense = 0;
+            for (let i = 0; i < records.length; i++) {
+                let r = records[i];
+                if (r.date.indexOf(prefix) === 0) {
+                    let amt = parseFloat(r.amount);
+                    if (r.type === 'income') income += amt;
+                    else expense += amt;
+                }
+            }
+            let balance = income - expense;
+            let target = savingsGoal || 0;
+            let percent = 0;
+            if (target > 0) {
+                percent = (balance / target) * 100;
+                if (percent > 100) percent = 100;
+                if (percent < 0) percent = 0;
+            }
+            let progressBar = document.getElementById('progressBar');
+            let progressLabel = document.getElementById('progressLabel');
+            progressBar.style.width = percent + '%';
+            progressBar.textContent = Math.round(percent) + '%';
+            progressLabel.innerHTML = `Progress: $${balance.toFixed(2)} / $${target.toFixed(2)} (${Math.round(percent)}%)`;
+        }
+        // ========== Category buttons initialization ==========
+        // Allow selecting only one category at a time
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                } else {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                }
+            });
+        });
+
+        // ========== Calendar rendering ==========
+        // Generates the calendar grid for the current month.
+        // Each cell shows only the day number.
+        function renderCalendar() {
+            let firstDay = new Date(year, month, 1);
+            let lastDay = new Date(year, month + 1, 0);
+            let startWeekday = firstDay.getDay();
+            let totalDays = lastDay.getDate();
+
+            let monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            document.getElementById('monthDisplay').innerHTML = '<b>' + monthNames[month] + ' ' + year + '</b>';
+
+            let html = '';
+            let dayCounter = 1;
+            for (let row = 0; row < 6; row++) {
+                html += '<tr>';
+                for (let col = 0; col < 7; col++) {
+                    if (row === 0 && col < startWeekday) {
+                        html += '<td></td>';
+                    } else if (dayCounter > totalDays) {
+                        html += '<td></td>';
+                    } else {
+                        let m = month + 1;
+                        if (m < 10) m = '0' + m;
+                        let d = dayCounter;
+                        if (d < 10) d = '0' + d;
+                        let dateStr = year + '-' + m + '-' + d;
+                        let dayRecords = records.filter(r => r.date === dateStr);
+                        let recordsHtml = '';
+                        if (dayRecords.length > 0) {
+                            // only show the first two records
+                            let shownRecords = dayRecords.slice(0, 2);
+                            recordsHtml = '<div class="day-details">';
+                            shownRecords.forEach(r => {
+                                let sign = (r.type === 'income') ? '+' : '-';
+                                let amount = parseFloat(r.amount).toFixed(2);
+                                let category = r.category ? r.category : '';
+                                recordsHtml += `<div class="day-record-item">${sign}$${amount} ${category}</div>`;
+                            });
+                            // more than two will show ...
+                            if (dayRecords.length > 2) {
+                                recordsHtml += '<div class="day-record-item more-indicator">...</div>';
+                            }
+                            recordsHtml += '</div>';
+                        }
+
+                        let content = '<b>' + dayCounter + '</b>' + recordsHtml;
+
+                        html += '<td onclick="handleDateClick(\'' + dateStr + '\')" style="cursor:pointer">' + content + '</td>';
+                        dayCounter++;
+                    }
+                }
+                html += '</tr>';
+                if (dayCounter > totalDays) break;
+            }
+            document.getElementById('calendarBody').innerHTML = html;
+        }
+
+        // ========== Date click handler ==========
+        // Triggered when a calendar cell is clicked.
+        // Sets the form date and opens the popup for that date.
+        function handleDateClick(dateStr) {
+            document.getElementById('recordDate').value = dateStr;
+            showPopup(dateStr);
+        }
+
+        // ========== Popup management ==========
+        // Displays the popup and fills it with records for the given date.
+        function showPopup(dateStr) {
+            let recordsForDate = records.filter(r => r.date === dateStr);
+            let popupRecordsDiv = document.getElementById('popupRecords');
+            let popupDateSpan = document.getElementById('popupDate');
+            popupDateSpan.innerText = formatDate(dateStr);
+
+            let html = '';
+            if (recordsForDate.length === 0) {
+                html = 'No records for this date.';
+            } else {
+                recordsForDate.forEach(r => {
+                    let sign = (r.type === 'income') ? '+' : '-';
+                    let categoryText = r.category ? '[' + r.category + ']' : '';
+                    html += `<div class="record-item">${sign}$${parseFloat(r.amount).toFixed(2)} ${categoryText} ${r.desc}</div>`;
+                });
+            }
+            popupRecordsDiv.innerHTML = html;
+
+            // Show popup
+            document.getElementById('popup').style.display = 'flex';
+        }
+
+        // Closes the popup
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        // Closes popup if user clicks on the semi-transparent background
+        function closePopupIfOutside(event) {
+            if (event.target === document.getElementById('popup')) {
+                closePopup();
+            }
+        }
+        // Switches between expense and income types
+        let currentType="expense";
+        function changeType(type){
+            currentType=type;
+            document.getElementById('recordType').value = type;
+            document.getElementById('btnExpense').classList.toggle('active', type === 'expense');
+            document.getElementById('btnIncome').classList.toggle('active', type === 'income');
+            document.getElementById('expenseCats').style.display = (type === 'expense') ? 'block' : 'none';
+            document.getElementById('incomeCats').style.display = (type === 'income') ? 'block' : 'none';
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('selected'));
+        }
+        // ========== Add record ==========
+        // Adds a new record from the form, updates calendar and summary,
+        // and refreshes popup if it's open for the same date.
+        function addRecord() {
+            let date = document.getElementById('recordDate').value;
+            let type = document.getElementById('recordType').value;
+            let amount = document.getElementById('recordAmount').value;
+            let desc = document.getElementById('recordDesc').value;
+
+            let selectedBtn = document.querySelector('.category-btn.selected');
+            let category = selectedBtn ? selectedBtn.getAttribute('data-category') : '';
+
+            let newRecord = {
+                id: Date.now(),
+                date: date,
+                type: type,
+                amount: amount,
+                category: category,
+                desc: desc
+            };
+
+            addRecordToDB(newRecord)
+                .then(() => {
+                    records.push(newRecord);
+                    renderCalendar();
+                    renderMonthSummary();      
+                    let popupDisplay = document.getElementById('popup').style.display;
+                    if (popupDisplay === 'flex' && document.getElementById('popupDate').innerText === date) {
+                        showPopup(date);
+                    }
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+                    document.getElementById('recordDate').value = getTodayString();
+                    document.getElementById('recordAmount').value = '';
+                    document.getElementById('recordDesc').value = '';
+                })
+                .catch(err => {
+                    alert("Add record failure: " + err);
+                });
+        }
+
+        
+        // ========== Monthly summary ==========
+        // Calculates and displays income, expense and balance for the current month.
+        function renderMonthSummary() {
+            let m = month + 1;
+            if (m < 10) m = '0' + m;
+            let prefix = year + '-' + m;
+            let income = 0, expense = 0;
+            for (let i = 0; i < records.length; i++) {
+                let r = records[i];
+                if (r.date.indexOf(prefix) === 0) {
+                    let amt = parseFloat(r.amount);
+                    if (r.type === 'income') income += amt;
+                    else expense += amt;
+                }
+            }
+            let balance = income - expense;
+            document.getElementById('totalIncome').innerText = '$' + income.toFixed(2);
+            document.getElementById('totalExpense').innerText = '$' + expense.toFixed(2);
+            document.getElementById('totalBalance').innerText = '$' + balance.toFixed(2);
+
+            updateProgressBar();
+        }
+
+        // ========== Month navigation ==========
+        function prevMonth() {
+            month--;
+            if (month < 0) { month = 11; year--; }
+            renderCalendar();
+            renderMonthSummary();
+        }
+
+        function nextMonth() {
+            month++;
+            if (month > 11) { month = 0; year++; }
+            renderCalendar();
+            renderMonthSummary();
+        }
+
+        document.getElementById("deleteData").addEventListener("click", async function() {
+        if (records.length === 0) {
+            alert("No data to delete.");
+            return;
+        }
+        if (!confirm("Are you sure you want to delete ALL financial records? This action cannot be undone.")) {
+            return;
+        }
+        try {
+            await deleteAllDataFromDB();
+            records = [];
+            renderCalendar();          // re-render the calendar
+            renderMonthSummary();       // recalculate the summary
+            closePopup();               // close the window that may be open
+            alert("All data has been deleted.");
+        } catch (err) {
+            console.error("Delete failed:", err);
+            alert("Failed to delete data: " + err);
+        }
+        });
+
+        // ========== Initialization ==========
+        (async function init() {
+            try {
+                await openDB();
+                const getRecords = await getRecordFromDB();
+                records = getRecords;
+                document.getElementById('recordDate').value = getTodayString();
+                renderCalendar();
+                renderMonthSummary();     
+            } catch (err) {
+                console.error("Initialization failure", err);
+                alert("Error occured. Please try again later.");
+            }
+        })();
+
+        //==========Summary view================
+        let mainView = document.getElementById('mainView');
+        let summaryView = document.getElementById('summaryView');
+        let sumButton = document.getElementById('Summary');
+        let backButton = document.getElementById('backButton');
+        let summaryHead = document.getElementById('sumhead');
+        let sumCon = document.getElementById('summaryContent');
+
+        let chartInstance = null;
+        let incomeCategoryChart = null;
+        let expenseCategoryChart = null;
+
+        //Display date
+        function formatDisplayDate(dateS){
+            if (!dateS) return ' ';                 // Null value returns a space
+            let d = new Date(dateS);                // Try converting to a data object
+            if (isNaN(d.getTime())) return dateS;   // For invalid datas, return the original value
+            return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+        // ==================== Summary button click handler ====================
+        sumButton.addEventListener('click', () => {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+             if (!startDate || ! endDate){
+                alert('Please select both start and end dates.');
+                return;
+            }else if (startDate > endDate){
+                alert('Start date cannot be after end date.');
+                return;
+            };
+            const filtered = records.filter(record => record.date >= startDate && record.date <= endDate);
+            let totalIncome = 0, totalExpense = 0;
+            const incomeByCategory = {};
+            const expenseByCategory = {};
+            filtered.forEach(record => {
+                const amt = parseFloat(record.amount);
+                if (record.type === 'income') {
+                    totalIncome += amt;
+                    const cat = record.category || 'Uncategorised';
+                    incomeByCategory[cat] = (incomeByCategory[cat] || 0 )+amt;
+
+                } else {
+                    totalExpense += amt;
+                    const cat = record.category || 'Uncategorised';
+                    expenseByCategory[cat] = (expenseByCategory[cat] || 0 )+amt;
+                }
+            });
+            const bal = totalIncome - totalExpense;
+            // Create a pie chart dataset
+            const overallData = {
+        labels: ['Income', 'Expense'],
+        datasets: [{
+            data: [totalIncome, totalExpense],
+            backgroundColor: ['#36a2eb', '#ff6384'],
+            hoverOffset: 4
+        }]
+            };
+            if (chartInstance) chartInstance.destroy();
+            const overallCtx = document.getElementById('summaryChart').getContext('2d');
+            chartInstance = new Chart(overallCtx, {
+                type: 'pie',
+                data: overallData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: (tooltipItem) => `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- 2. Income by category pie chart ---
+            const incomeCategories = Object.keys(incomeByCategory);
+            const incomeAmounts = incomeCategories.map(cat => incomeByCategory[cat]);
+
+            // Income category color
+            const incomeColors = [
+                '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107',
+                '#ff9800', '#ff5722', '#795548', '#9e9e9e', '#607d8b'
+            ];
+            // For any category beyond the palette, use grey
+            const finalIncomeColors = incomeCategories.map((_, i) => incomeColors[i % incomeColors.length]);
+
+            if (incomeCategoryChart) incomeCategoryChart.destroy();
+            const incomeCtx = document.getElementById('incomeCategoryChart').getContext('2d');
+            if (incomeCategories.length > 0) {
+                incomeCategoryChart = new Chart(incomeCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: incomeCategories,
+                        datasets: [{
+                            data: incomeAmounts,
+                            backgroundColor: finalIncomeColors,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'top' },
+                            title: { display: true, text: 'Income by Category' },
+                            tooltip: {
+                                callbacks: {
+                                    label: (tooltipItem) => `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // No income data – optionally show a message or hide the canvas
+                document.getElementById('incomeCategoryChart').style.display = 'none';
+            }
+
+            // --- 3. Expense by category pie chart ---
+            const expenseCategories = Object.keys(expenseByCategory);
+            const expenseAmounts = expenseCategories.map(cat => expenseByCategory[cat]);
+
+            // Expense category colors
+            const expenseColors = [
+                '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+                '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#ff5722'
+            ];
+            const finalExpenseColors = expenseCategories.map((_, i) => expenseColors[i % expenseColors.length]);
+
+            if (expenseCategoryChart) expenseCategoryChart.destroy();
+            const expenseCtx = document.getElementById('expenseCategoryChart').getContext('2d');
+            if (expenseCategories.length > 0) {
+                expenseCategoryChart = new Chart(expenseCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: expenseCategories,
+                        datasets: [{
+                            data: expenseAmounts,
+                            backgroundColor: finalExpenseColors,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'top' },
+                            title: { display: true, text: 'Expenses by Category' },
+                            tooltip: {
+                                callbacks: {
+                                    label: (tooltipItem) => `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('expenseCategoryChart').style.display = 'none';
+            }
+
+            const sumCon = document.getElementById('summaryContent');
+            sumCon.innerHTML = '';
+            const summaryHead = document.getElementById('sumhead');
+
+            summaryHead.textContent = `Spending Summary: ${formatDisplayDate(startDate)} - ${formatDisplayDate(endDate)}`;
+            document.title = `Financial Summary: ${formatDisplayDate(startDate)} - ${formatDisplayDate(endDate)}`;
+
+            document.getElementById('summaryPopup').style.display = 'flex';
+        });
+        // ==================== Close popup functions ====================
+        function closeSummaryPopup(){
+            document.getElementById('summaryPopup').style.display = 'none';
+        }
+        function closeSummaryPopupIfOutside(event){
+            if (event.target === document.getElementById('summaryPopup')){
+                closeSummaryPopup();
+            }
+        }
+        
+        document.getElementById('closeSummaryBtn').addEventListener('click',closeSummaryPopup);
+        // ==================== Destroy old chart instances ====================
+        if (chartInstance){
+            chartInstance.destroy();
+            chartInstance = null;
+        }
+        if (incomeCategoryChart){
+            incomeCategoryChart.destroy();
+            incomeCategoryChart = null;
+        }
+        if (expenseCategoryChart){
+            expenseCategoryChart.destroy();
+            expenseCategoryChart = null;
+        }
+    </script>
+</body>
+</html>

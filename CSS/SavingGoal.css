@@ -1,0 +1,55 @@
+/* ========== Savings goal input styles ========== */
+.savings-goal-container {
+    display: inline-block;
+    margin-left: 0px;
+    vertical-align: middle;
+}
+/* save goal title style */
+.savings-goal-title {
+    font-size: 38px;      
+    font-weight: bold;
+    display: inline;
+    margin-left: 0px;
+    
+}
+.savings-goal-input {
+    font-size: 30px;     
+    font-weight: bold;
+    border: none;
+    padding: 0 5px;
+    width: 150px;
+    border-bottom: 2px solid #ccc;
+    margin-left: 0px;
+    vertical-align: middle;
+    background: transparent;
+}
+.savings-goal-input:focus {
+    border-bottom-color: #ddd;
+    outline:none;
+}
+/* Process bar styles */
+.progress-container {
+    margin-top: 8px;
+    width: 100%;
+    max-width: 300px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.progress-bar {
+    width: 0%;
+    height: 14px;
+    background-color: #56cd2b;
+    text-align: center;
+    line-height: 14px;
+    color: white;
+    font-size: 12px;
+    transition: width 0.3s ease;        /* transition attribute */
+    
+}
+.progress-label {
+    font-size: 12px;
+    margin-top: 5px;
+    color: #666;
+    margin-left: 0px;
+}
